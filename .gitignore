@@ -1,0 +1,11 @@
+# ignore all .idea
+.idea**
+.mvn**
+mvnw**
+node_modules
+target
+
+webpack.generated.js
+webpack.config.js
+package.json
+package-lock.json
