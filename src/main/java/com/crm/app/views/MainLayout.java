@@ -100,7 +100,7 @@ public class MainLayout extends AppLayout {
         logoLayout.setId("logo");
         logoLayout.setAlignItems(FlexComponent.Alignment.CENTER);
         logoLayout.add(new Image("images/logo.png", "vaadin-crm logo"));
-        logoLayout.add(new H1("Dashboard !"));
+        logoLayout.add(new H1("Dashboard"));
         layout.add(logoLayout, menu);
         return layout;
     }
