@@ -118,10 +118,8 @@ public class MainLayout extends AppLayout {
 
     private List<Tab> createMenuItems() {
         MenuItemInfo[] menuItems = new MenuItemInfo[]{ //
-                new MenuItemInfo("Home", "la la-globe", HomeView.class), //
-
-                new MenuItemInfo("Schema", "la la-file", SchemaView.class), //
-
+            new MenuItemInfo("Home", "la la-globe", HomeView.class), //
+            new MenuItemInfo("Schema", "la la-file", SchemaView.class), //
         };
         List<Tab> tabs = new ArrayList<>();
         for (MenuItemInfo menuItemInfo : menuItems) {
