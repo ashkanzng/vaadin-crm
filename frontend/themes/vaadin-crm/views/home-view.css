@@ -2,3 +2,6 @@
   display: block;
   padding: 1em;
 }
+.vaadin-split-layout #splitter{
+  background-color: red !important;
+}

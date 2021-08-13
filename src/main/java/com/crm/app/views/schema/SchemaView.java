@@ -3,12 +3,12 @@ package com.crm.app.views.schema;
 import com.crm.app.api.ApiClient;
 import com.crm.app.views.MainLayout;
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H4;
+import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.listbox.ListBox;
-import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
-import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
@@ -37,45 +37,38 @@ public class SchemaView extends Div {
 
 
         body = new HorizontalLayout();
-        body.getStyle().set("padding", "20px").set("border-bottom", "1px solid #EEEEEE");
+        body.getStyle().set("padding", "10px").set("border-bottom", "1px solid #EEEEEE");
         body.setMargin(true);
         body.setSpacing(true);
-        body.setVerticalComponentAlignment(FlexComponent.Alignment.END);
+        body.setWidth("100%");
 
-        add(header,body);
         showTables();
         createTableForm();
+        add(header,body);
+
     }
 
     private void createTableForm() {
+        H4 h4 = new H4("Create New Table");
         Button createButton = new Button("Add column");
-        TextField column = new TextField();
-        TextField column1 = new TextField();
-        HorizontalLayout row1 = new HorizontalLayout();
-        row1.add(tableName);
-
-        VerticalLayout row2 = new VerticalLayout();
-        row2.setWidth("50%");
-        row2.setSpacing(true);
-
 //        createButton.addClickListener(e -> {
-//            TextField column = new TextField();
-//            formContainer.add(container,column);
 //        });
-//        input.getStyle().set("margin-right","10px");
-        row2.add(column,column1,createButton);
-        body.add(row1,row2);
-        body.setFlexGrow(0.5,row1);
-        body.setFlexGrow(0.5,row2);
+        FormLayout formLayout = new FormLayout();
+
+        body.add(formLayout);
+        body.setFlexGrow(2,formLayout);
+
     }
 
 
     private void showTables() {
+        HorizontalLayout listLayout = new HorizontalLayout(new Label("Tables"));
         listBox = new ListBox<>();
         listBox.setItems(ApiClient.getAllTables());
         listBox.setValue(ApiClient.getAllTables()[0]);
         listBox.addValueChangeListener(e -> System.out.println(e.getValue()));
-        body.add(listBox);
-        body.setFlexGrow(0.5,listBox);
+        listLayout.add(listBox);
+        body.add(listLayout);
+        body.setFlexGrow(1,listLayout);
     }
 }

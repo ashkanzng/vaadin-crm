@@ -1,7 +1,6 @@
 package com.crm.app.views;
 
 import com.crm.app.views.home.HomeView;
-import com.crm.app.views.schema.SchemaView;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.ComponentUtil;
 import com.vaadin.flow.component.Text;
@@ -118,8 +117,8 @@ public class MainLayout extends AppLayout {
 
     private List<Tab> createMenuItems() {
         MenuItemInfo[] menuItems = new MenuItemInfo[]{ //
-            new MenuItemInfo("Home", "la la-globe", HomeView.class), //
-            new MenuItemInfo("Tables", "la la-database", SchemaView.class) //
+            new MenuItemInfo("Tables", "la la-database", HomeView.class), //
+            //new MenuItemInfo("Tables", "la la-database", SchemaView.class) //
         };
         List<Tab> tabs = new ArrayList<>();
         for (MenuItemInfo menuItemInfo : menuItems) {
