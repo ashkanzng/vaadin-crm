@@ -27,8 +27,10 @@ public class HomeView extends HorizontalLayout {
 
     private HorizontalLayout header;
     private SplitLayout mainLayout;
+
+    private VerticalLayout formLayout;
     private TextField tableName;
-    private String newTable;
+    private String newTableName;
     private List<String> newTableColumns;
 
 
@@ -52,13 +54,15 @@ public class HomeView extends HorizontalLayout {
         listBox = new ListBox<>();
         listBox.setItems(ApiClient.getAllTables());
         listBox.setValue(ApiClient.getAllTables()[0]);
-        listBox.addValueChangeListener(e -> tableName.setValue(e.getValue()));
+        listBox.addValueChangeListener(e -> {
+            tableName.setValue(e.getValue());
+        });
         listLayout.add(listBox);
         mainLayout.addToPrimary(listLayout);
     }
 
     private void createTableForm() {
-        VerticalLayout formLayout = new VerticalLayout(new Label("Create new table"));
+        formLayout = new VerticalLayout(new Label("Create new table"));
 
         HorizontalLayout buttonLayout = new HorizontalLayout();
         buttonLayout.setDefaultVerticalComponentAlignment(Alignment.END);
