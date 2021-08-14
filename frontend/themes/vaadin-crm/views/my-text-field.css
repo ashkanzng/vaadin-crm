@@ -1,0 +1,10 @@
+:host([required][class="error"]) [part="input-field"] {
+    border: 1px solid #ff1818;
+}
+:host([required]:not([has-value])) [part="label"]::after {
+    opacity: 1;
+    color: red;
+}
+:host([invalid]) [part="input-field"] {
+    background-color: #e7ebee;
+}

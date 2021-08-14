@@ -16,10 +16,10 @@ import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.router.RouteAlias;
+import java.util.HashSet;
+import java.util.Set;
 
-import java.util.List;
-
-@CssImport(value = "./themes/vaadin-crm/views/text-field.css",themeFor = "vaadin-text-field")
+@CssImport(value = "./themes/vaadin-crm/views/my-text-field.css", themeFor = "vaadin-text-field")
 @PageTitle("Home")
 @Route(value = "home", layout = MainLayout.class)
 @RouteAlias(value = "", layout = MainLayout.class)
@@ -27,17 +27,16 @@ public class HomeView extends HorizontalLayout {
 
     private HorizontalLayout header;
     private SplitLayout mainLayout;
-
     private VerticalLayout formLayout;
+    private HorizontalLayout operationLayout;
     private TextField tableName;
     private String newTableName;
-    private List<String> newTableColumns;
-
+    private Set<String> newTableColumns = new HashSet<>();
 
     public HomeView() {
         addClassName("home-view");
         header = new HorizontalLayout();
-        header.getStyle().set("border-bottom", "1px solid #EEEEEE").set("padding-bottom","10px");
+        header.getStyle().set("border-bottom", "1px solid #EEEEEE").set("padding-bottom", "10px");
         header.setMargin(true);
         header.add(new H4("SQLite schema tables"));
         mainLayout = new SplitLayout();
@@ -45,7 +44,7 @@ public class HomeView extends HorizontalLayout {
         mainLayout.setSplitterPosition(25);
         showTables();
         createTableForm();
-        add(header,mainLayout);
+        add(header, mainLayout);
     }
 
     private void showTables() {
@@ -56,6 +55,7 @@ public class HomeView extends HorizontalLayout {
         listBox.setValue(ApiClient.getAllTables()[0]);
         listBox.addValueChangeListener(e -> {
             tableName.setValue(e.getValue());
+            operationLayout.setVisible(true);
         });
         listLayout.add(listBox);
         mainLayout.addToPrimary(listLayout);
@@ -63,6 +63,7 @@ public class HomeView extends HorizontalLayout {
 
     private void createTableForm() {
         formLayout = new VerticalLayout(new Label("Create new table"));
+        operationLayout = new HorizontalLayout();
 
         HorizontalLayout buttonLayout = new HorizontalLayout();
         buttonLayout.setDefaultVerticalComponentAlignment(Alignment.END);
@@ -71,29 +72,47 @@ public class HomeView extends HorizontalLayout {
         TextField columnName = new TextField();
 
         tableName.setLabel("Table name");
-        columnName.setLabel("Column name");
         tableName.setRequired(true);
         tableName.setWidth("200px");
         tableName.addKeyDownListener(v -> {
             if (tableName.hasClassName("error")) tableName.removeClassName("error");
         });
         columnName.setWidth("160px");
-
-        Button addColumnButton = new Button("Add column",VaadinIcon.PLUS.create());
-        addColumnButton.setMaxWidth("130px");
-        addColumnButton.addClickListener(e -> {
-            if (tableName.getValue().isEmpty()){
-                tableName.setClassName("error");
-                return;
-            }
-            TextField c = new TextField();
-            c.setValue(columnName.getValue());
-            c.setMaxWidth("160px");
-            formLayout.add(c);
+        columnName.setLabel("Column name");
+        columnName.setRequired(true);
+        Button save = new Button("Save", VaadinIcon.FILE_ADD.create());
+        Button cancel = new Button("Cancel", VaadinIcon.CLOSE_CIRCLE.create());
+        cancel.addClickListener(e -> {
+            operationLayout.setVisible(false);
+            tableName.clear();
+            columnName.clear();
         });
-        buttonLayout.add(tableName,columnName,addColumnButton);
-        formLayout.add(buttonLayout);
+        Button addColumnButton = new Button("", VaadinIcon.PLUS.create());
+        addColumnButton.setMaxWidth("120px");
+        addColumnButton.addClickListener(e -> {
+            addColumn(columnName);
+        });
+        buttonLayout.add(tableName, columnName, addColumnButton);
+        operationLayout.add(cancel,save);
+        operationLayout.setVisible(false);
+        formLayout.add(buttonLayout,operationLayout);
         mainLayout.addToSecondary(formLayout);
     }
 
+    private void addColumn(TextField columnName){
+        if (tableName.getValue().isEmpty()) {
+            tableName.setClassName("error");
+            return;
+        }
+        if (columnName.getValue().isEmpty()){
+            return;
+        }
+        if (!newTableColumns.contains(columnName.getValue())){
+            TextField newColumn = new TextField();
+            newColumn.setValue(columnName.getValue());
+            newColumn.setMaxWidth("160px");
+            newTableColumns.add(columnName.getValue());
+        }
+        if (!operationLayout.isVisible()) operationLayout.setVisible(true);
+    }
 }
