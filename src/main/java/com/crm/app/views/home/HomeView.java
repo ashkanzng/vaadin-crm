@@ -28,6 +28,7 @@ public class HomeView extends HorizontalLayout {
     private HorizontalLayout header;
     private SplitLayout mainLayout;
     private VerticalLayout formLayout;
+    private VerticalLayout columnLayout;
     private HorizontalLayout operationLayout;
     private TextField tableName;
     private String newTableName;
@@ -62,10 +63,11 @@ public class HomeView extends HorizontalLayout {
     }
 
     private void createTableForm() {
-        formLayout = new VerticalLayout(new Label("Create new table"));
+        formLayout = new VerticalLayout(new Label("Create/Update table"));
+        columnLayout = new VerticalLayout();
         operationLayout = new HorizontalLayout();
-
         HorizontalLayout buttonLayout = new HorizontalLayout();
+        columnLayout.setPadding(false);
         buttonLayout.setDefaultVerticalComponentAlignment(Alignment.END);
 
         tableName = new TextField();
@@ -86,6 +88,7 @@ public class HomeView extends HorizontalLayout {
             operationLayout.setVisible(false);
             tableName.clear();
             columnName.clear();
+            columnLayout.removeAll();
         });
         Button addColumnButton = new Button("", VaadinIcon.PLUS.create());
         addColumnButton.setMaxWidth("120px");
@@ -95,7 +98,7 @@ public class HomeView extends HorizontalLayout {
         buttonLayout.add(tableName, columnName, addColumnButton);
         operationLayout.add(cancel,save);
         operationLayout.setVisible(false);
-        formLayout.add(buttonLayout,operationLayout);
+        formLayout.add(buttonLayout,columnLayout,operationLayout);
         mainLayout.addToSecondary(formLayout);
     }
 
@@ -110,8 +113,9 @@ public class HomeView extends HorizontalLayout {
         if (!newTableColumns.contains(columnName.getValue())){
             TextField newColumn = new TextField();
             newColumn.setValue(columnName.getValue());
-            newColumn.setMaxWidth("160px");
+            newColumn.setMaxWidth("200px");
             newTableColumns.add(columnName.getValue());
+            columnLayout.add(newColumn);
         }
         if (!operationLayout.isVisible()) operationLayout.setVisible(true);
     }
