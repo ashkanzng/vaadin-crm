@@ -30,8 +30,10 @@ public class HomeView extends HorizontalLayout {
     private VerticalLayout formLayout;
     private VerticalLayout columnLayout;
     private HorizontalLayout operationLayout;
+    private VerticalLayout listBoxLayout;
     private TextField tableName;
-    private String newTableName;
+    private TextField columnName;
+    private ListBox<String> listBox;
     private Set<String> newTableColumns = new HashSet<>();
 
     public HomeView() {
@@ -49,17 +51,17 @@ public class HomeView extends HorizontalLayout {
     }
 
     private void showTables() {
-        VerticalLayout listLayout = new VerticalLayout(new Label("Tables"));
-        ListBox<String> listBox;
+        listBoxLayout = new VerticalLayout(new Label("Tables"));
         listBox = new ListBox<>();
         listBox.setItems(ApiClient.getAllTables());
-        listBox.setValue(ApiClient.getAllTables()[0]);
         listBox.addValueChangeListener(e -> {
             tableName.setValue(e.getValue());
             operationLayout.setVisible(true);
+            newTableColumns.clear();
         });
-        listLayout.add(listBox);
-        mainLayout.addToPrimary(listLayout);
+
+        listBoxLayout.add(listBox);
+        mainLayout.addToPrimary(listBoxLayout);
     }
 
     private void createTableForm() {
@@ -71,7 +73,7 @@ public class HomeView extends HorizontalLayout {
         buttonLayout.setDefaultVerticalComponentAlignment(Alignment.END);
 
         tableName = new TextField();
-        TextField columnName = new TextField();
+        columnName = new TextField();
 
         tableName.setLabel("Table name");
         tableName.setRequired(true);
@@ -82,13 +84,9 @@ public class HomeView extends HorizontalLayout {
         columnName.setWidth("160px");
         columnName.setLabel("Column name");
         columnName.setRequired(true);
-        Button save = new Button("Save", VaadinIcon.FILE_ADD.create());
-        Button cancel = new Button("Cancel", VaadinIcon.CLOSE_CIRCLE.create());
-        cancel.addClickListener(e -> {
-            operationLayout.setVisible(false);
-            tableName.clear();
-            columnName.clear();
-            columnLayout.removeAll();
+        Button save = new Button("Save", VaadinIcon.FILE_ADD.create(), e-> ApiClient.createTable(tableName.getValue(),newTableColumns));
+        Button cancel = new Button("Cancel", VaadinIcon.CLOSE_CIRCLE.create(),e -> {
+            clearForm();
         });
         Button addColumnButton = new Button("", VaadinIcon.PLUS.create());
         addColumnButton.setMaxWidth("120px");
@@ -113,10 +111,20 @@ public class HomeView extends HorizontalLayout {
         if (!newTableColumns.contains(columnName.getValue())){
             TextField newColumn = new TextField();
             newColumn.setValue(columnName.getValue());
+            newColumn.setReadOnly(true);
             newColumn.setMaxWidth("200px");
             newTableColumns.add(columnName.getValue());
             columnLayout.add(newColumn);
         }
         if (!operationLayout.isVisible()) operationLayout.setVisible(true);
+    }
+
+    private void clearForm(){
+        operationLayout.setVisible(false);
+        tableName.clear();
+        columnName.clear();
+        columnLayout.removeAll();
+        newTableColumns.clear();
+        listBox.setValue("6");
     }
 }
