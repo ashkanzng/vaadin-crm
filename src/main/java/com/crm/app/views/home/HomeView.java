@@ -17,12 +17,9 @@ import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.router.RouteAlias;
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
 
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 @CssImport(value = "./themes/vaadin-crm/views/my-text-field.css", themeFor = "vaadin-text-field")
@@ -42,7 +39,7 @@ public class HomeView extends HorizontalLayout {
     private TextField columnName;
     private ListBox<String> listBox;
     private Set<String> newTableColumns = new HashSet<>();
-    private Grid<Data> grid = new Grid<>(Data.class,true);
+    private Grid<Map<String, String>> grid = new Grid<>();
 
     public HomeView() {
         addClassName("home-view");
@@ -100,6 +97,7 @@ public class HomeView extends HorizontalLayout {
         Button save = new Button("Save", VaadinIcon.FILE_ADD.create(), e -> {
             ApiClient.createTable(tableName.getValue(), newTableColumns);
             clearForm();
+            listBox.setItems(ApiClient.getAllTables());
         });
         Button cancel = new Button("Cancel", VaadinIcon.CLOSE_CIRCLE.create(),e -> {
             clearForm();
@@ -136,22 +134,16 @@ public class HomeView extends HorizontalLayout {
     }
 
     private void createTableGrid(String tableName){
-        System.out.println(ApiClient.getTableData(tableName));
+        grid.removeAllColumns();
         gridLayout.add(grid);
-        List<Data> l = new ArrayList<>();
-        l.add(new Data(1,"test","ewe"));
-        l.add(new Data(4,"koob","ewe"));
-        l.add(new Data(2,"bar","ewe"));
-        l.add(new Data(7,"fool","ewe"));
-        l.add(new Data(8,"fool","ewe"));
-        l.add(new Data(9,"fool","ewe"));
-        l.add(new Data(12,"fool","ewe"));
-        l.add(new Data(17,"fool","ewe"));
-
-        grid.setItems(l);
+        grid.addColumn(myhash -> myhash.get("id")).setHeader("id").setSortable(true);
+        grid.addColumn(myhash -> myhash.get("target_Port")).setHeader("target_Port").setSortable(true);
+        grid.addColumn(myhash -> myhash.get("condition"));
+        grid.addColumn(myhash -> myhash.get("notes"));
         grid.addSelectionListener(e->{
-            e.getFirstSelectedItem().ifPresent(d -> System.out.println(d.getId()));
+            e.getFirstSelectedItem().ifPresent(d -> System.out.println(d));
         });
+        grid.setItems(ApiClient.getTableData("ddd"));
     }
 
     private void clearForm(){
@@ -160,14 +152,5 @@ public class HomeView extends HorizontalLayout {
         columnName.clear();
         columnLayout.removeAll();
         newTableColumns.clear();
-    }
-
-    @lombok.Data
-    @AllArgsConstructor
-    @NoArgsConstructor
-    public static class Data {
-        private Integer id;
-        private String name;
-        private String tui;
     }
 }
