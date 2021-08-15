@@ -26,11 +26,10 @@ public class ApiClient {
                 "table-3",
                 "table-4"};
     }
-
-
-    public static String[] getAllTables(String tableName) {
+    
+    public static String[] getTableSchema(String tableName) {
         System.out.println(URL+"/get-table-schema/"+tableName);
-        return new String[]{"col-1","col-2"};
+        return new String[]{"col-1","col-2","col-3"};
     }
 
     public static void createTable(String tableName, Set<String> columns) {
