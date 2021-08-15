@@ -4,6 +4,7 @@ import com.crm.app.api.ApiClient;
 import com.crm.app.views.MainLayout;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.dependency.CssImport;
+import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.H4;
 import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.icon.VaadinIcon;
@@ -16,7 +17,12 @@ import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.router.RouteAlias;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
+
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @CssImport(value = "./themes/vaadin-crm/views/my-text-field.css", themeFor = "vaadin-text-field")
@@ -30,11 +36,13 @@ public class HomeView extends HorizontalLayout {
     private VerticalLayout formLayout;
     private VerticalLayout columnLayout;
     private HorizontalLayout operationLayout;
+    private VerticalLayout gridLayout;
     private VerticalLayout listBoxLayout;
     private TextField tableName;
     private TextField columnName;
     private ListBox<String> listBox;
     private Set<String> newTableColumns = new HashSet<>();
+    private Grid<Data> grid = new Grid<Data>(Data.class,true);
 
     public HomeView() {
         addClassName("home-view");
@@ -45,9 +53,12 @@ public class HomeView extends HorizontalLayout {
         mainLayout = new SplitLayout();
         mainLayout.addThemeVariants(SplitLayoutVariant.LUMO_SMALL);
         mainLayout.setSplitterPosition(25);
+        gridLayout = new VerticalLayout(new Label("Grid table"));
+        gridLayout.setMargin(true);
+        gridLayout.setSpacing(true);
         showTables();
         createTableForm();
-        add(header, mainLayout);
+        add(header, mainLayout,gridLayout);
     }
 
     private void showTables() {
@@ -61,8 +72,8 @@ public class HomeView extends HorizontalLayout {
             for (String s : ApiClient.getTableSchema(e.getValue())) {
                 addColumn(new TextField("",s,""));
             }
+            createTableGrid(e.getValue());
         });
-
         listBoxLayout.add(listBox);
         mainLayout.addToPrimary(listBoxLayout);
     }
@@ -87,7 +98,10 @@ public class HomeView extends HorizontalLayout {
         columnName.setWidth("160px");
         columnName.setLabel("Column name");
         columnName.setRequired(true);
-        Button save = new Button("Save", VaadinIcon.FILE_ADD.create(), e-> ApiClient.createTable(tableName.getValue(),newTableColumns));
+        Button save = new Button("Save", VaadinIcon.FILE_ADD.create(), e -> {
+            ApiClient.createTable(tableName.getValue(), newTableColumns);
+            clearForm();
+        });
         Button cancel = new Button("Cancel", VaadinIcon.CLOSE_CIRCLE.create(),e -> {
             clearForm();
         });
@@ -122,11 +136,29 @@ public class HomeView extends HorizontalLayout {
         if (!operationLayout.isVisible()) operationLayout.setVisible(true);
     }
 
+    private void createTableGrid(String tableName){
+        System.out.println(ApiClient.getTableData(tableName));
+        gridLayout.add(grid);
+
+        List<Data> l = new ArrayList<>();
+        l.add(new Data(1,"hgjs","ewe"));
+        grid.setItems(l);
+    }
+
     private void clearForm(){
         operationLayout.setVisible(false);
         tableName.clear();
         columnName.clear();
         columnLayout.removeAll();
         newTableColumns.clear();
+    }
+
+    @lombok.Data
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class Data {
+        private Integer id;
+        private String name;
+        private String tui;
     }
 }

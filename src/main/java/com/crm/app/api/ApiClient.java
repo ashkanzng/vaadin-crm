@@ -2,8 +2,7 @@ package com.crm.app.api;
 
 import org.springframework.web.client.RestTemplate;
 
-import java.util.Arrays;
-import java.util.Set;
+import java.util.*;
 
 public class ApiClient {
 
@@ -28,13 +27,28 @@ public class ApiClient {
     }
 
     public static String[] getTableSchema(String tableName) {
-        System.out.println(URL+"/get-table-schema/"+tableName);
-        return new String[]{"col-1","col-2","col-3"};
+        System.out.println(URL+"get-table-schema/"+tableName);
+        return new String[]{"id",
+                "created_at",
+                "update_at",
+                "target_Port",
+                "condition",
+                "notes"};
     }
 
     public static void createTable(String tableName, Set<String> columns) {
         System.out.println(URL + "create-table");
         System.out.println(URL + "add-header/"+tableName);
         System.out.println(Arrays.toString(columns.toArray()));
+    }
+
+    public static List<Map<String, String>> getTableData(String tableName){
+        System.out.println(URL+"get-all-data/"+tableName);
+        return List.of(new HashMap<>(){{
+            put("id","1");
+            put("target_Port","1");
+            put("condition","1");
+            put("notes","1");
+        }});
     }
 }
