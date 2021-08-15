@@ -55,9 +55,12 @@ public class HomeView extends HorizontalLayout {
         listBox = new ListBox<>();
         listBox.setItems(ApiClient.getAllTables());
         listBox.addValueChangeListener(e -> {
+            clearForm();
             tableName.setValue(e.getValue());
             operationLayout.setVisible(true);
-            newTableColumns.clear();
+            for (String s : ApiClient.getTableSchema(e.getValue())) {
+                addColumn(new TextField("",s,""));
+            }
         });
 
         listBoxLayout.add(listBox);
@@ -125,6 +128,5 @@ public class HomeView extends HorizontalLayout {
         columnName.clear();
         columnLayout.removeAll();
         newTableColumns.clear();
-
     }
 }
