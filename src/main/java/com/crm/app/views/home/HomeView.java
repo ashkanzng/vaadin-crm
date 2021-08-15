@@ -42,7 +42,7 @@ public class HomeView extends HorizontalLayout {
     private TextField columnName;
     private ListBox<String> listBox;
     private Set<String> newTableColumns = new HashSet<>();
-    private Grid<Data> grid = new Grid<Data>(Data.class,true);
+    private Grid<Data> grid = new Grid<>(Data.class,true);
 
     public HomeView() {
         addClassName("home-view");
@@ -54,7 +54,6 @@ public class HomeView extends HorizontalLayout {
         mainLayout.addThemeVariants(SplitLayoutVariant.LUMO_SMALL);
         mainLayout.setSplitterPosition(25);
         gridLayout = new VerticalLayout(new Label("Grid table"));
-        gridLayout.setMargin(true);
         gridLayout.setSpacing(true);
         showTables();
         createTableForm();
@@ -139,10 +138,20 @@ public class HomeView extends HorizontalLayout {
     private void createTableGrid(String tableName){
         System.out.println(ApiClient.getTableData(tableName));
         gridLayout.add(grid);
-
         List<Data> l = new ArrayList<>();
-        l.add(new Data(1,"hgjs","ewe"));
+        l.add(new Data(1,"test","ewe"));
+        l.add(new Data(4,"koob","ewe"));
+        l.add(new Data(2,"bar","ewe"));
+        l.add(new Data(7,"fool","ewe"));
+        l.add(new Data(8,"fool","ewe"));
+        l.add(new Data(9,"fool","ewe"));
+        l.add(new Data(12,"fool","ewe"));
+        l.add(new Data(17,"fool","ewe"));
+
         grid.setItems(l);
+        grid.addSelectionListener(e->{
+            e.getFirstSelectedItem().ifPresent(d -> System.out.println(d.getId()));
+        });
     }
 
     private void clearForm(){
