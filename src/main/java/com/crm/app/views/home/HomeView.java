@@ -125,6 +125,6 @@ public class HomeView extends HorizontalLayout {
         columnName.clear();
         columnLayout.removeAll();
         newTableColumns.clear();
-        listBox.setValue("6");
+
     }
 }

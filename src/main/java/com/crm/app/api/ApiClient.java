@@ -27,6 +27,12 @@ public class ApiClient {
                 "table-4"};
     }
 
+
+    public static String[] getAllTables(String tableName) {
+        System.out.println(URL+"/get-table-schema/"+tableName);
+        return new String[]{"col-1","col-2"};
+    }
+
     public static void createTable(String tableName, Set<String> columns) {
         System.out.println(URL + "create-table");
         System.out.println(URL + "add-header/"+tableName);
