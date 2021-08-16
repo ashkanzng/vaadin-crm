@@ -17,10 +17,10 @@ import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.router.RouteAlias;
-
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+
 
 @CssImport(value = "./themes/vaadin-crm/views/my-text-field.css", themeFor = "vaadin-text-field")
 @PageTitle("Home")
@@ -40,9 +40,11 @@ public class HomeView extends HorizontalLayout {
     private ListBox<String> listBox;
     private Set<String> newTableColumns = new HashSet<>();
     private Grid<Map<String, String>> grid = new Grid<>();
+    private String[] allTables;
 
     public HomeView() {
         addClassName("home-view");
+
         header = new HorizontalLayout();
         header.getStyle().set("border-bottom", "1px solid #EEEEEE").set("padding-bottom", "10px");
         header.setMargin(true);
@@ -54,10 +56,13 @@ public class HomeView extends HorizontalLayout {
 
         gridLayout = new VerticalLayout(new Label("Grid table"));
         gridLayout.setSpacing(true);
+        grid.setMaxHeight("350px");
+        gridLayout.add(grid);
 
         listBoxLayout = new VerticalLayout(new Label("Tables"));
         formLayout = new VerticalLayout(new Label("Create/Update table"));
 
+        allTables = ApiClient.getAllTables();
         showTables();
         createTableForm();
 
@@ -66,17 +71,16 @@ public class HomeView extends HorizontalLayout {
 
     private void showTables() {
         listBox = new ListBox<>();
-        listBox.setItems(ApiClient.getAllTables());
+        listBox.setItems(allTables);
         listBox.addValueChangeListener(e -> {
             clearForm();
             if (e.getValue() == null){
-                System.out.println(e.getValue());
                 return;
             }
             tableName.setValue(e.getValue());
             operationLayout.setVisible(true);
-            for (String s : ApiClient.getTableSchema(e.getValue())) {
-                addColumn(new TextField("",s,""));
+            for (String column : ApiClient.getTableSchema(e.getValue())) {
+                addColumn(new TextField("",column,""));
             }
             createTableGrid(e.getValue());
         });
@@ -92,22 +96,23 @@ public class HomeView extends HorizontalLayout {
         columnLayout.setPadding(false);
         buttonLayout.setDefaultVerticalComponentAlignment(Alignment.END);
 
-        tableName = new TextField();
-        columnName = new TextField();
+        tableName = new TextField("Table name");
+        columnName = new TextField("Column name");
 
-        tableName.setLabel("Table name");
         tableName.setRequired(true);
         tableName.setWidth("200px");
         tableName.addKeyDownListener(v -> {
             if (tableName.hasClassName("error")) tableName.removeClassName("error");
         });
         columnName.setWidth("160px");
-        columnName.setLabel("Column name");
         columnName.setRequired(true);
+
         Button save = new Button("Save", VaadinIcon.FILE_ADD.create(), e -> {
             ApiClient.createTable(tableName.getValue(), newTableColumns);
             clearForm();
-            listBox.setItems(ApiClient.getAllTables());
+            allTables = ApiClient.getAllTables();
+            listBox.setItems(allTables);
+            listBox.setValue(null);
         });
         Button cancel = new Button("Cancel", VaadinIcon.CLOSE_CIRCLE.create(),e -> {
             clearForm();
@@ -147,11 +152,16 @@ public class HomeView extends HorizontalLayout {
 
     private void createTableGrid(String tableName){
         grid.removeAllColumns();
-        gridLayout.add(grid);
-        grid.addColumn(myhash -> myhash.get("id")).setHeader("Id").setSortable(true);
-        grid.addColumn(myhash -> myhash.get("target_Port")).setHeader("Target Port").setSortable(true);
-        grid.addColumn(myhash -> myhash.get("condition")).setHeader("Condition").setSortable(true);
-        grid.addColumn(myhash -> myhash.get("notes"));
+
+        for (String column : ApiClient.getTableSchema(tableName)) {
+            grid.addColumn(myhash -> myhash.get(column)).setHeader(column).setSortable(true);
+        }
+
+
+//        grid.addColumn(myhash -> myhash.get("id")).setHeader("Id").setSortable(true);
+//        grid.addColumn(myhash -> myhash.get("target_Port")).setHeader("Target Port").setSortable(true);
+//        grid.addColumn(myhash -> myhash.get("condition")).setHeader("Condition").setSortable(true);
+//        grid.addColumn(myhash -> myhash.get("notes"));
         grid.addSelectionListener(e->{
             e.getFirstSelectedItem().ifPresent(rowData -> System.out.println(rowData));
         });

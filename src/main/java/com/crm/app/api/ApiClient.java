@@ -2,10 +2,7 @@ package com.crm.app.api;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.*;
@@ -25,25 +22,25 @@ public class ApiClient {
     public static String[] getTableSchema(String tableName) {
         ResponseEntity<String[]> response = restTemplate.getForEntity(URL+"get-table-schema/"+tableName, String[].class);
         return response.getBody();
-//        return new String[]{"id",
-//                "created_at",
-//                "update_at",
-//                "target_Port",
-//                "condition",
-//                "notes"};
     }
 
     public static void createTable(String tableName, Set<String> columns){
-//        System.out.println(URL + "create-table");
-//        System.out.println(URL + "add-header/"+tableName);
-//        System.out.println(Arrays.toString(columns.toArray()));
         try{
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
-            Map<String,String> dataRequest = new HashMap<>(){{ put("name",tableName);}};
-            HttpEntity<String> request = new HttpEntity<>(mapper.writeValueAsString(dataRequest), headers);
+            Map<String,String> tableNameRequest = new HashMap<>(){{ put("name",tableName);}};
+            String[] tableColumnRequest = Arrays.copyOf(columns.toArray(),columns.size(),String[].class);
+            HttpEntity<String> request = new HttpEntity<>(mapper.writeValueAsString(tableNameRequest), headers);
             ResponseEntity<String> result = restTemplate.postForEntity(URL + "create-table", request, String.class);
             System.out.println(result.getStatusCode());
+
+            request = new HttpEntity<>(mapper.writeValueAsString(tableColumnRequest),headers);
+            result = restTemplate.postForEntity(URL + "add-header/"+tableName, request, String.class);
+
+            if (result.getStatusCode() == HttpStatus.OK){
+                System.out.println(result.getBody());
+            }
+
         }catch (JsonProcessingException jsonProcessingException){
             System.out.println(jsonProcessingException.getMessage());
         }

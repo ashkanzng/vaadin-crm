@@ -35,3 +35,8 @@
   background-color: var(--lumo-primary-color-10pct);
   color: var(--lumo-primary-text-color);
 }
+
+/*Added By ashkan*/
+.sidemenu-header{
+  /*background-color: #16203e;*/
+}
