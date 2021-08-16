@@ -47,22 +47,32 @@ public class HomeView extends HorizontalLayout {
         header.getStyle().set("border-bottom", "1px solid #EEEEEE").set("padding-bottom", "10px");
         header.setMargin(true);
         header.add(new H4("SQLite schema tables"));
+
         mainLayout = new SplitLayout();
         mainLayout.addThemeVariants(SplitLayoutVariant.LUMO_SMALL);
         mainLayout.setSplitterPosition(25);
+
         gridLayout = new VerticalLayout(new Label("Grid table"));
         gridLayout.setSpacing(true);
+
+        listBoxLayout = new VerticalLayout(new Label("Tables"));
+        formLayout = new VerticalLayout(new Label("Create/Update table"));
+
         showTables();
         createTableForm();
+
         add(header, mainLayout,gridLayout);
     }
 
     private void showTables() {
-        listBoxLayout = new VerticalLayout(new Label("Tables"));
         listBox = new ListBox<>();
         listBox.setItems(ApiClient.getAllTables());
         listBox.addValueChangeListener(e -> {
             clearForm();
+            if (e.getValue() == null){
+                System.out.println(e.getValue());
+                return;
+            }
             tableName.setValue(e.getValue());
             operationLayout.setVisible(true);
             for (String s : ApiClient.getTableSchema(e.getValue())) {
@@ -75,7 +85,7 @@ public class HomeView extends HorizontalLayout {
     }
 
     private void createTableForm() {
-        formLayout = new VerticalLayout(new Label("Create/Update table"));
+
         columnLayout = new VerticalLayout();
         operationLayout = new HorizontalLayout();
         HorizontalLayout buttonLayout = new HorizontalLayout();
@@ -101,6 +111,7 @@ public class HomeView extends HorizontalLayout {
         });
         Button cancel = new Button("Cancel", VaadinIcon.CLOSE_CIRCLE.create(),e -> {
             clearForm();
+            listBox.setValue(null);
         });
         Button addColumnButton = new Button("", VaadinIcon.PLUS.create());
         addColumnButton.setMaxWidth("120px");
@@ -120,6 +131,7 @@ public class HomeView extends HorizontalLayout {
             return;
         }
         if (columnName.getValue().isEmpty()){
+            columnName.setClassName("error");
             return;
         }
         if (!newTableColumns.contains(columnName.getValue())){
@@ -136,14 +148,14 @@ public class HomeView extends HorizontalLayout {
     private void createTableGrid(String tableName){
         grid.removeAllColumns();
         gridLayout.add(grid);
-        grid.addColumn(myhash -> myhash.get("id")).setHeader("id").setSortable(true);
-        grid.addColumn(myhash -> myhash.get("target_Port")).setHeader("target_Port").setSortable(true);
-        grid.addColumn(myhash -> myhash.get("condition"));
+        grid.addColumn(myhash -> myhash.get("id")).setHeader("Id").setSortable(true);
+        grid.addColumn(myhash -> myhash.get("target_Port")).setHeader("Target Port").setSortable(true);
+        grid.addColumn(myhash -> myhash.get("condition")).setHeader("Condition").setSortable(true);
         grid.addColumn(myhash -> myhash.get("notes"));
         grid.addSelectionListener(e->{
-            e.getFirstSelectedItem().ifPresent(d -> System.out.println(d));
+            e.getFirstSelectedItem().ifPresent(rowData -> System.out.println(rowData));
         });
-        grid.setItems(ApiClient.getTableData("ddd"));
+        grid.setItems(ApiClient.getTableData(tableName));
     }
 
     private void clearForm(){
@@ -152,5 +164,6 @@ public class HomeView extends HorizontalLayout {
         columnName.clear();
         columnLayout.removeAll();
         newTableColumns.clear();
+        grid.removeAllColumns();
     }
 }

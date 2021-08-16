@@ -19,24 +19,10 @@ public class ApiClient {
 
     public static String[] getAllTables() {
         ResponseEntity<String[]> response = restTemplate.getForEntity(URL + "get-tables", String[].class);
-        System.out.println(URL + "get-tables");
-//        return new String[]{"authority",
-//                "hibernate_sequence",
-//                "users",
-//                "measurement-1",
-//                "configuration",
-//                "table-1",
-//                "table-1",
-//                "table-1",
-//                "table-2",
-//                "table-3",
-//                "table-3",
-//                "table-4"};
         return response.getBody();
     }
 
     public static String[] getTableSchema(String tableName) {
-        System.out.println(URL+"get-table-schema/"+tableName);
         ResponseEntity<String[]> response = restTemplate.getForEntity(URL+"get-table-schema/"+tableName, String[].class);
         return response.getBody();
 //        return new String[]{"id",
@@ -48,10 +34,9 @@ public class ApiClient {
     }
 
     public static void createTable(String tableName, Set<String> columns){
-        System.out.println(URL + "create-table");
-        System.out.println(URL + "add-header/"+tableName);
-        System.out.println(Arrays.toString(columns.toArray()));
-
+//        System.out.println(URL + "create-table");
+//        System.out.println(URL + "add-header/"+tableName);
+//        System.out.println(Arrays.toString(columns.toArray()));
         try{
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
@@ -65,7 +50,7 @@ public class ApiClient {
     }
 
     public static List<Map<String, String>> getTableData(String tableName){
-        System.out.println(URL+"get-all-data/"+tableName);
+//        System.out.println(URL+"get-all-data/"+tableName);
         return List.of(new HashMap<>(){{
             put("id","1");
             put("target_Port","1345");
