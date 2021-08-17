@@ -17,10 +17,8 @@ import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.router.RouteAlias;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+
+import java.util.*;
 
 
 @CssImport(value = "./themes/vaadin-crm/views/my-text-field.css", themeFor = "vaadin-text-field")
@@ -40,9 +38,9 @@ public class HomeView extends HorizontalLayout {
     private TextField columnName;
     private ListBox<String> listBox;
     private Set<String> newTableColumns = new HashSet<>();
-    private Grid<Map<String, String>> grid = new Grid<>();
+    private Grid<Map<String, String>> grid;
     private String[] allTables;
-
+    private VerticalLayout dataForm;
     private SplitLayout secondLayout;
 
     public HomeView() {
@@ -52,32 +50,35 @@ public class HomeView extends HorizontalLayout {
         header.getStyle().set("border-bottom", "1px solid #EEEEEE").set("padding-bottom", "10px");
         header.add(new H4("SQLite schema tables"));
 
+        secondLayout = new SplitLayout();
+        secondLayout.addThemeVariants(SplitLayoutVariant.LUMO_SMALL);
+        secondLayout.setSplitterPosition(60);
+        secondLayout.setMaxHeight("450px");
+
         mainLayout = new SplitLayout();
         mainLayout.addThemeVariants(SplitLayoutVariant.LUMO_SMALL);
         mainLayout.setSplitterPosition(15);
-
-        secondLayout = new SplitLayout();
-        secondLayout.addThemeVariants(SplitLayoutVariant.LUMO_SMALL);
-        secondLayout.setSplitterPosition(40);
         mainLayout.addToSecondary(secondLayout);
 
         gridLayout = new VerticalLayout(new Label("Grid table"));
+        grid = new Grid<>();
         grid.setMaxHeight("350px");
         gridLayout.add(grid);
 
         listBoxLayout = new VerticalLayout(new Label("Tables"));
+
         formLayout = new VerticalLayout(new Label("Create/Update table"));
         formLayout.setMaxHeight("450px");
 
         allTables = ApiClient.getAllTables();
+        dataForm = new VerticalLayout();
+        secondLayout.addToSecondary(dataForm);
 
         tableName = new TextField("Table name");
         columnName = new TextField("Column name");
 
         showTables();
         createTableForm();
-        createDataForm("");
-        
         add(header, mainLayout,gridLayout);
     }
 
@@ -106,9 +107,7 @@ public class HomeView extends HorizontalLayout {
         operationLayout = new HorizontalLayout();
         HorizontalLayout buttonLayout = new HorizontalLayout();
         columnLayout.setPadding(false);
-
         buttonLayout.setDefaultVerticalComponentAlignment(Alignment.END);
-
         tableName.setRequired(true);
         tableName.setWidth("200px");
         tableName.addKeyDownListener(v -> {
@@ -136,7 +135,6 @@ public class HomeView extends HorizontalLayout {
         operationLayout.add(cancel,save);
         operationLayout.setVisible(false);
         formLayout.add(buttonLayout,columnLayout,operationLayout);
-        //mainLayout.addToSecondary(formLayout);
         secondLayout.addToPrimary(formLayout);
     }
 
@@ -163,20 +161,41 @@ public class HomeView extends HorizontalLayout {
     }
 
     private void createTableGrid(String tableName){
-        for (String column : ApiClient.getTableSchema(tableName)) {
+        List<Map<String, String>> data = ApiClient.getTableData(tableName);
+        if (data == null){
+            data = List.of(Map.of("id",""));
+        }
+
+
+        String[] headers = ApiClient.getTableSchema(tableName);
+        for (String column : headers) {
             grid.addColumn(myhash -> myhash.get(column)).setHeader(column).setSortable(true).setAutoWidth(true);
         }
         //grid.addColumn(myhash -> myhash.get("id")).setHeader("Id").setSortable(true);
-        grid.addSelectionListener(e->{
-            e.getFirstSelectedItem().ifPresent(rowData -> System.out.println(rowData));
+        grid.addItemClickListener(e -> {
+            System.out.println(e.getItem());
         });
-        List<Map<String, String>> data = ApiClient.getTableData(tableName);
-        if (data != null) grid.setItems(ApiClient.getTableData(tableName));
+
+
+        grid.setItems(data);
+        createDataForm(headers);
     }
 
-    private void createDataForm(String tableName){
-        //VerticalLayout dataForm = new VerticalLayout();
-        secondLayout.addToSecondary(new Label("ssddfff"));
+    private void createDataForm(String[] headers){
+        dataForm.add(new Label("Insert/Update data"));
+        HorizontalLayout buttonLayout = new HorizontalLayout();
+        buttonLayout.setDefaultVerticalComponentAlignment(Alignment.END);
+        Button cancel = new Button("Cancel", VaadinIcon.CLOSE_CIRCLE.create(),e -> {
+            clearForm();
+            listBox.setValue(null);
+        });
+        for (String header : headers) {
+            TextField f = new TextField(header);
+            if (header.equals("id")) f.setReadOnly(true);
+            f.getElement().setProperty("name",header);
+            dataForm.add(f);
+        }
+        dataForm.add(cancel);
     }
 
     private void clearForm(){
@@ -186,6 +205,7 @@ public class HomeView extends HorizontalLayout {
         columnLayout.removeAll();
         newTableColumns.clear();
         grid.removeAllColumns();
+        dataForm.removeAll();
     }
 
 }
