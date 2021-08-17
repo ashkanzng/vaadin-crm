@@ -151,17 +151,11 @@ public class HomeView extends HorizontalLayout {
     }
 
     private void createTableGrid(String tableName){
-        grid.removeAllColumns();
-
+        //grid.removeAllColumns();
         for (String column : ApiClient.getTableSchema(tableName)) {
             grid.addColumn(myhash -> myhash.get(column)).setHeader(column).setSortable(true);
         }
-
-
 //        grid.addColumn(myhash -> myhash.get("id")).setHeader("Id").setSortable(true);
-//        grid.addColumn(myhash -> myhash.get("target_Port")).setHeader("Target Port").setSortable(true);
-//        grid.addColumn(myhash -> myhash.get("condition")).setHeader("Condition").setSortable(true);
-//        grid.addColumn(myhash -> myhash.get("notes"));
         grid.addSelectionListener(e->{
             e.getFirstSelectedItem().ifPresent(rowData -> System.out.println(rowData));
         });
