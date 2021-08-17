@@ -154,7 +154,7 @@ public class HomeView extends HorizontalLayout {
         for (String column : ApiClient.getTableSchema(tableName)) {
             grid.addColumn(myhash -> myhash.get(column)).setHeader(column).setSortable(true);
         }
-//        grid.addColumn(myhash -> myhash.get("id")).setHeader("Id").setSortable(true);
+        //grid.addColumn(myhash -> myhash.get("id")).setHeader("Id").setSortable(true);
         grid.addSelectionListener(e->{
             e.getFirstSelectedItem().ifPresent(rowData -> System.out.println(rowData));
         });
@@ -169,4 +169,5 @@ public class HomeView extends HorizontalLayout {
         newTableColumns.clear();
         grid.removeAllColumns();
     }
+
 }

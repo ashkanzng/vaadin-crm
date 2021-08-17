@@ -2,6 +2,7 @@ package com.crm.app.api;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
 import org.springframework.web.client.RestTemplate;
 
@@ -47,17 +48,12 @@ public class ApiClient {
     }
 
     public static List<Map<String, String>> getTableData(String tableName){
-//        System.out.println(URL+"get-all-data/"+tableName);
-        return List.of(new HashMap<>(){{
-            put("id","1");
-            put("target_Port","1345");
-            put("condition","451");
-            put("notes","341");
-        }},new HashMap<>(){{
-            put("id","2");
-            put("target_Port","13425");
-            put("condition","451");
-            put("notes","3411");
-        }});
+
+        //ResponseEntity<?extends List<Map<String,String>>> result = restTemplate.getForEntity(URL+"get-all-data/"+tableName, (Class<?  extends List<Map<String,String>>>) List.class);
+        ResponseEntity<List<Map<String, String>>> result = restTemplate.exchange(URL+"get-all-data/"+tableName,HttpMethod.GET,null, new ParameterizedTypeReference<>() {});
+        if (result.getStatusCode() == HttpStatus.OK){
+            return result.getBody();
+        }
+        return null;
     }
 }
