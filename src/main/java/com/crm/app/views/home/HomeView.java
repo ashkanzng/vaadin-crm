@@ -47,7 +47,6 @@ public class HomeView extends HorizontalLayout {
 
         header = new HorizontalLayout();
         header.getStyle().set("border-bottom", "1px solid #EEEEEE").set("padding-bottom", "10px");
-        //header.setMargin(true);
         header.add(new H4("SQLite schema tables"));
 
         mainLayout = new SplitLayout();
@@ -55,7 +54,6 @@ public class HomeView extends HorizontalLayout {
         mainLayout.setSplitterPosition(25);
 
         gridLayout = new VerticalLayout(new Label("Grid table"));
-        //gridLayout.setSpacing(true);
         grid.setMaxHeight("350px");
         gridLayout.add(grid);
 
@@ -119,11 +117,13 @@ public class HomeView extends HorizontalLayout {
             clearForm();
             listBox.setValue(null);
         });
-        Button addColumnButton = new Button("", VaadinIcon.PLUS.create());
-        addColumnButton.setMaxWidth("120px");
-        addColumnButton.addClickListener(e -> {
+        Button addColumnButton = new Button("", VaadinIcon.PLUS.create(),e -> {
             addColumn(columnName);
         });
+        addColumnButton.setMaxWidth("120px");
+//        addColumnButton.addClickListener(e -> {
+//            addColumn(columnName);
+//        });
         buttonLayout.add(tableName, columnName, addColumnButton);
         operationLayout.add(cancel,save);
         operationLayout.setVisible(false);
