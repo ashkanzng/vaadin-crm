@@ -62,6 +62,7 @@ public class HomeView extends HorizontalLayout {
 
         gridLayout = new VerticalLayout(new Label("Grid table"));
         grid = new Grid<>();
+        grid.addItemClickListener(e -> fillDataForm(e.getItem()));
         grid.setMaxHeight("350px");
         gridLayout.add(grid);
 
@@ -161,21 +162,16 @@ public class HomeView extends HorizontalLayout {
     }
 
     private void createTableGrid(String tableName){
+
         List<Map<String, String>> data = ApiClient.getTableData(tableName);
         if (data == null){
             data = List.of(Map.of("id",""));
         }
-
-
         String[] headers = ApiClient.getTableSchema(tableName);
         for (String column : headers) {
             grid.addColumn(myhash -> myhash.get(column)).setHeader(column).setSortable(true).setAutoWidth(true);
         }
         //grid.addColumn(myhash -> myhash.get("id")).setHeader("Id").setSortable(true);
-        grid.addItemClickListener(e -> {
-            System.out.println(e.getItem());
-        });
-
 
         grid.setItems(data);
         createDataForm(headers);
@@ -196,6 +192,12 @@ public class HomeView extends HorizontalLayout {
             dataForm.add(f);
         }
         dataForm.add(cancel);
+    }
+
+    private void fillDataForm(Map<String, String> row){
+        dataForm.getChildren().forEach(c -> {
+            System.out.println(c.getElement().getProperty("name"));
+        });
     }
 
     private void clearForm(){
