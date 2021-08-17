@@ -151,7 +151,6 @@ public class HomeView extends HorizontalLayout {
     }
 
     private void createTableGrid(String tableName){
-        //grid.removeAllColumns();
         for (String column : ApiClient.getTableSchema(tableName)) {
             grid.addColumn(myhash -> myhash.get(column)).setHeader(column).setSortable(true);
         }
