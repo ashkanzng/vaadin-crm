@@ -152,7 +152,7 @@ public class HomeView extends HorizontalLayout {
 
     private void createTableGrid(String tableName){
         for (String column : ApiClient.getTableSchema(tableName)) {
-            grid.addColumn(myhash -> myhash.get(column)).setHeader(column).setSortable(true);
+            grid.addColumn(myhash -> myhash.get(column)).setHeader(column).setSortable(true).setAutoWidth(true);
         }
         //grid.addColumn(myhash -> myhash.get("id")).setHeader("Id").setSortable(true);
         grid.addSelectionListener(e->{
