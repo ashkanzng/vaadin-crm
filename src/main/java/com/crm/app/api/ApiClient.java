@@ -4,13 +4,15 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.*;
 
 public class ApiClient {
 
-    static final String URL = "http://localhost:8082/api/";
+    //static final String URL = "http://localhost:8082/api/";
+    static final String URL = "http://157.90.55.120:8082/api/";
     static final RestTemplate restTemplate = new RestTemplate();
     static ObjectMapper mapper = new ObjectMapper();
 
@@ -48,11 +50,14 @@ public class ApiClient {
     }
 
     public static List<Map<String, String>> getTableData(String tableName){
-
-        //ResponseEntity<?extends List<Map<String,String>>> result = restTemplate.getForEntity(URL+"get-all-data/"+tableName, (Class<?  extends List<Map<String,String>>>) List.class);
-        ResponseEntity<List<Map<String, String>>> result = restTemplate.exchange(URL+"get-all-data/"+tableName,HttpMethod.GET,null, new ParameterizedTypeReference<>() {});
-        if (result.getStatusCode() == HttpStatus.OK){
-            return result.getBody();
+        try{
+            //ResponseEntity<?extends List<Map<String,String>>> result = restTemplate.getForEntity(URL+"get-all-data/"+tableName, (Class<?  extends List<Map<String,String>>>) List.class);
+            ResponseEntity<List<Map<String, String>>> result = restTemplate.exchange(URL+"get-all-data/"+tableName,HttpMethod.GET,null, new ParameterizedTypeReference<>() {});
+            if (result.getStatusCode() == HttpStatus.OK){
+                return result.getBody();
+            }
+        }catch (HttpClientErrorException httpClientErrorException){
+            System.out.println(httpClientErrorException.getStatusCode());
         }
         return null;
     }

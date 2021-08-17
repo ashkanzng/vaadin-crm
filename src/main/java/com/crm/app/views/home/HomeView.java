@@ -18,6 +18,7 @@ import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.router.RouteAlias;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -42,6 +43,8 @@ public class HomeView extends HorizontalLayout {
     private Grid<Map<String, String>> grid = new Grid<>();
     private String[] allTables;
 
+    private SplitLayout secondLayout;
+
     public HomeView() {
         addClassName("home-view");
 
@@ -51,7 +54,12 @@ public class HomeView extends HorizontalLayout {
 
         mainLayout = new SplitLayout();
         mainLayout.addThemeVariants(SplitLayoutVariant.LUMO_SMALL);
-        mainLayout.setSplitterPosition(25);
+        mainLayout.setSplitterPosition(15);
+
+        secondLayout = new SplitLayout();
+        secondLayout.addThemeVariants(SplitLayoutVariant.LUMO_SMALL);
+        secondLayout.setSplitterPosition(40);
+        mainLayout.addToSecondary(secondLayout);
 
         gridLayout = new VerticalLayout(new Label("Grid table"));
         grid.setMaxHeight("350px");
@@ -59,11 +67,17 @@ public class HomeView extends HorizontalLayout {
 
         listBoxLayout = new VerticalLayout(new Label("Tables"));
         formLayout = new VerticalLayout(new Label("Create/Update table"));
+        formLayout.setMaxHeight("450px");
 
         allTables = ApiClient.getAllTables();
+
+        tableName = new TextField("Table name");
+        columnName = new TextField("Column name");
+
         showTables();
         createTableForm();
-
+        createDataForm("");
+        
         add(header, mainLayout,gridLayout);
     }
 
@@ -95,9 +109,6 @@ public class HomeView extends HorizontalLayout {
 
         buttonLayout.setDefaultVerticalComponentAlignment(Alignment.END);
 
-        tableName = new TextField("Table name");
-        columnName = new TextField("Column name");
-
         tableName.setRequired(true);
         tableName.setWidth("200px");
         tableName.addKeyDownListener(v -> {
@@ -121,18 +132,18 @@ public class HomeView extends HorizontalLayout {
             addColumn(columnName);
         });
         addColumnButton.setMaxWidth("120px");
-//        addColumnButton.addClickListener(e -> {
-//            addColumn(columnName);
-//        });
         buttonLayout.add(tableName, columnName, addColumnButton);
         operationLayout.add(cancel,save);
         operationLayout.setVisible(false);
         formLayout.add(buttonLayout,columnLayout,operationLayout);
-        mainLayout.addToSecondary(formLayout);
+        //mainLayout.addToSecondary(formLayout);
+        secondLayout.addToPrimary(formLayout);
     }
 
     private void addColumn(TextField columnName){
         if (tableName.getValue().isEmpty()) {
+            //tableName.setErrorMessage("fill the name");
+            //tableName.setInvalid(true);
             tableName.setClassName("error");
             return;
         }
@@ -159,7 +170,13 @@ public class HomeView extends HorizontalLayout {
         grid.addSelectionListener(e->{
             e.getFirstSelectedItem().ifPresent(rowData -> System.out.println(rowData));
         });
-        grid.setItems(ApiClient.getTableData(tableName));
+        List<Map<String, String>> data = ApiClient.getTableData(tableName);
+        if (data != null) grid.setItems(ApiClient.getTableData(tableName));
+    }
+
+    private void createDataForm(String tableName){
+        //VerticalLayout dataForm = new VerticalLayout();
+        secondLayout.addToSecondary(new Label("ssddfff"));
     }
 
     private void clearForm(){
