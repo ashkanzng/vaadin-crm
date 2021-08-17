@@ -47,7 +47,7 @@ public class HomeView extends HorizontalLayout {
 
         header = new HorizontalLayout();
         header.getStyle().set("border-bottom", "1px solid #EEEEEE").set("padding-bottom", "10px");
-        header.setMargin(true);
+        //header.setMargin(true);
         header.add(new H4("SQLite schema tables"));
 
         mainLayout = new SplitLayout();
@@ -55,7 +55,7 @@ public class HomeView extends HorizontalLayout {
         mainLayout.setSplitterPosition(25);
 
         gridLayout = new VerticalLayout(new Label("Grid table"));
-        gridLayout.setSpacing(true);
+        //gridLayout.setSpacing(true);
         grid.setMaxHeight("350px");
         gridLayout.add(grid);
 
@@ -94,6 +94,7 @@ public class HomeView extends HorizontalLayout {
         operationLayout = new HorizontalLayout();
         HorizontalLayout buttonLayout = new HorizontalLayout();
         columnLayout.setPadding(false);
+
         buttonLayout.setDefaultVerticalComponentAlignment(Alignment.END);
 
         tableName = new TextField("Table name");
