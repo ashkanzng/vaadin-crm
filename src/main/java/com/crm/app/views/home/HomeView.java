@@ -1,11 +1,11 @@
 package com.crm.app.views.home;
 
 import com.crm.app.api.ApiClient;
+import com.crm.app.component.HeaderComponent;
 import com.crm.app.views.MainLayout;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.grid.Grid;
-import com.vaadin.flow.component.html.H4;
 import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.listbox.ListBox;
@@ -18,7 +18,10 @@ import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.router.RouteAlias;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 
 @CssImport(value = "./themes/vaadin-crm/views/my-text-field.css", themeFor = "vaadin-text-field")
@@ -27,7 +30,6 @@ import java.util.*;
 @RouteAlias(value = "", layout = MainLayout.class)
 public class HomeView extends HorizontalLayout {
 
-    private HorizontalLayout header;
     private SplitLayout mainLayout;
     private VerticalLayout formLayout;
     private VerticalLayout columnLayout;
@@ -43,16 +45,15 @@ public class HomeView extends HorizontalLayout {
     private VerticalLayout dataForm;
     private SplitLayout secondLayout;
 
+    private HeaderComponent headerComponent = new HeaderComponent();
+
     public HomeView() {
         addClassName("home-view");
 
-        header = new HorizontalLayout();
-        header.getStyle().set("border-bottom", "1px solid #EEEEEE").set("padding-bottom", "10px");
-        header.add(new H4("SQLite schema tables"));
 
         secondLayout = new SplitLayout();
         secondLayout.addThemeVariants(SplitLayoutVariant.LUMO_SMALL);
-        secondLayout.setSplitterPosition(60);
+        secondLayout.setSplitterPosition(50);
         secondLayout.setMaxHeight("450px");
 
         mainLayout = new SplitLayout();
@@ -60,7 +61,7 @@ public class HomeView extends HorizontalLayout {
         mainLayout.setSplitterPosition(15);
         mainLayout.addToSecondary(secondLayout);
 
-        gridLayout = new VerticalLayout(new Label("Grid table"));
+        gridLayout = new VerticalLayout(new Label("Table Data"));
         grid = new Grid<>();
         grid.addItemClickListener(e -> fillDataForm(e.getItem()));
         grid.setMaxHeight("350px");
@@ -80,17 +81,18 @@ public class HomeView extends HorizontalLayout {
 
         showTables();
         createTableForm();
-        add(header, mainLayout,gridLayout);
+        add(headerComponent.getHeader(),mainLayout,gridLayout);
     }
 
     private void showTables() {
         listBox = new ListBox<>();
         listBox.setItems(allTables);
+        listBox.setValue(allTables[0]);
         listBox.addValueChangeListener(e -> {
-            clearForm();
             if (e.getValue() == null){
                 return;
             }
+            clearForm();
             tableName.setValue(e.getValue());
             operationLayout.setVisible(true);
             for (String column : ApiClient.getTableSchema(e.getValue())) {
@@ -172,7 +174,6 @@ public class HomeView extends HorizontalLayout {
             grid.addColumn(myhash -> myhash.get(column)).setHeader(column).setSortable(true).setAutoWidth(true);
         }
         //grid.addColumn(myhash -> myhash.get("id")).setHeader("Id").setSortable(true);
-
         grid.setItems(data);
         createDataForm(headers);
     }
@@ -183,20 +184,30 @@ public class HomeView extends HorizontalLayout {
         buttonLayout.setDefaultVerticalComponentAlignment(Alignment.END);
         Button cancel = new Button("Cancel", VaadinIcon.CLOSE_CIRCLE.create(),e -> {
             clearForm();
-            listBox.setValue(null);
+            //listBox.setValue(null);
+        });
+        Button save = new Button("Save", VaadinIcon.FILE_ADD.create(), e -> {
+            clearForm();
         });
         for (String header : headers) {
-            TextField f = new TextField(header);
-            if (header.equals("id")) f.setReadOnly(true);
-            f.getElement().setProperty("name",header);
-            dataForm.add(f);
+            TextField field = new TextField(header);
+            if (header.equals("id") || header.equals("created_at") || header.equals("update_at")){
+                continue;
+            }
+            field.getElement().setProperty("name",header);
+            dataForm.add(field);
         }
-        dataForm.add(cancel);
+        HorizontalLayout operationLayout = new HorizontalLayout(save,cancel);
+        dataForm.add(operationLayout);
     }
 
     private void fillDataForm(Map<String, String> row){
         dataForm.getChildren().forEach(c -> {
-            System.out.println(c.getElement().getProperty("name"));
+            //c.getElement().setProperty("value",row.get(c.getElement().getProperty("name")));
+            if (c instanceof TextField && row.get(c.getElement().getProperty("name")) != null){
+                TextField field = (TextField)c;
+                field.setValue(row.get(c.getElement().getProperty("name")));
+            }
         });
     }
 
