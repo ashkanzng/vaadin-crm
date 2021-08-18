@@ -14,21 +14,16 @@ public class LayoutComponent {
     private VerticalLayout listBoxLayout;
 
     public LayoutComponent() {
-
         secondLayout = new SplitLayout();
         secondLayout.addThemeVariants(SplitLayoutVariant.LUMO_SMALL);
         secondLayout.setSplitterPosition(50);
         secondLayout.setMaxHeight("450px");
-
         mainLayout = new SplitLayout();
         mainLayout.addThemeVariants(SplitLayoutVariant.LUMO_SMALL);
         mainLayout.setSplitterPosition(15);
         mainLayout.addToSecondary(secondLayout);
-
         listBoxLayout = new VerticalLayout(new Label("Tables"));
-
         gridLayout = new VerticalLayout(new Label("Table Data"));
-
         formLayout = new VerticalLayout(new Label("Create/Update table"));
         formLayout.setMaxHeight("450px");
     }
