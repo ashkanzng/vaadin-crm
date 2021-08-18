@@ -37,7 +37,11 @@ public class ApiClient {
             Map<String, String> tableNameRequest = new HashMap<>() {{
                 put("name", tableName);
             }};
-            String[] tableColumnRequest = Arrays.copyOf(columns.stream().sorted().toArray(), columns.size(), String[].class);
+            String[] tableColumnRequest = Arrays.copyOf(columns.toArray(), columns.size(), String[].class);
+            Arrays.sort(tableColumnRequest);
+
+            System.out.println(Arrays.toString(tableColumnRequest));
+
             HttpEntity<String> request = new HttpEntity<>(mapper.writeValueAsString(tableNameRequest), headers);
             ResponseEntity<String> result = restTemplate.postForEntity(URL + "create-table", request, String.class);
             System.out.println(result.getStatusCode());
