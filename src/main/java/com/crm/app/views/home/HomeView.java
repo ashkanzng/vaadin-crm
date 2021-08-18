@@ -44,41 +44,31 @@ public class HomeView extends HorizontalLayout {
     private String[] allTables;
     private VerticalLayout dataForm;
     private SplitLayout secondLayout;
-
     private HeaderComponent headerComponent = new HeaderComponent();
 
     public HomeView() {
         addClassName("home-view");
-
-
         secondLayout = new SplitLayout();
         secondLayout.addThemeVariants(SplitLayoutVariant.LUMO_SMALL);
         secondLayout.setSplitterPosition(50);
         secondLayout.setMaxHeight("450px");
-
         mainLayout = new SplitLayout();
         mainLayout.addThemeVariants(SplitLayoutVariant.LUMO_SMALL);
         mainLayout.setSplitterPosition(15);
         mainLayout.addToSecondary(secondLayout);
-
         gridLayout = new VerticalLayout(new Label("Table Data"));
         grid = new Grid<>();
         grid.addItemClickListener(e -> fillDataForm(e.getItem()));
         grid.setMaxHeight("350px");
         gridLayout.add(grid);
-
         listBoxLayout = new VerticalLayout(new Label("Tables"));
-
         formLayout = new VerticalLayout(new Label("Create/Update table"));
         formLayout.setMaxHeight("450px");
-
         allTables = ApiClient.getAllTables();
         dataForm = new VerticalLayout();
         secondLayout.addToSecondary(dataForm);
-
         tableName = new TextField("Table name");
         columnName = new TextField("Column name");
-
         createTableForm();
         showTables();
         add(headerComponent.getHeader(),mainLayout,gridLayout);
@@ -159,7 +149,6 @@ public class HomeView extends HorizontalLayout {
     }
 
     private void createTableGrid(String tableName){
-
         List<Map<String, String>> data = ApiClient.getTableData(tableName);
         if (data == null){
             data = List.of(Map.of("id",""));
@@ -179,7 +168,6 @@ public class HomeView extends HorizontalLayout {
         buttonLayout.setDefaultVerticalComponentAlignment(Alignment.END);
         Button cancel = new Button("Cancel", VaadinIcon.CLOSE_CIRCLE.create(),e -> {
             clearForm();
-            listBox.setValue(null);
         });
         Button save = new Button("Save", VaadinIcon.FILE_ADD.create(), e -> {
             clearForm();
@@ -198,7 +186,6 @@ public class HomeView extends HorizontalLayout {
 
     private void fillDataForm(Map<String, String> row){
         dataForm.getChildren().forEach(c -> {
-            //c.getElement().setProperty("value",row.get(c.getElement().getProperty("name")));
             if (c instanceof TextField && row.get(c.getElement().getProperty("name")) != null){
                 TextField field = (TextField)c;
                 field.setValue(row.get(c.getElement().getProperty("name")));
@@ -224,6 +211,7 @@ public class HomeView extends HorizontalLayout {
         newTableColumns.clear();
         grid.removeAllColumns();
         dataForm.removeAll();
+        listBox.setValue(null);
     }
 
 }
