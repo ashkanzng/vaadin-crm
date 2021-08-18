@@ -17,10 +17,7 @@ import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.router.RouteAlias;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 
 @CssImport(value = "./themes/vaadin-crm/views/my-text-field.css", themeFor = "vaadin-text-field")
@@ -184,6 +181,7 @@ public class HomeView extends HorizontalLayout {
     private void showTableColumnsAndGrid(String nameOfTable){
         tableName.setValue(nameOfTable);
         operationLayout.setVisible(true);
+        System.out.println(Arrays.toString(ApiClient.getTableSchema(nameOfTable)));
         for (String column : ApiClient.getTableSchema(nameOfTable)) {
             addColumn(new TextField("",column,""));
         }
