@@ -39,15 +39,17 @@ public class HomeView extends HorizontalLayout {
     private TextField tableName;
     private TextField columnName;
     private ListBox<String> listBox;
-    private Set<String> newTableColumns = new HashSet<>();
+    private Set<String> newTableColumns;
     private Grid<Map<String, String>> grid;
     private String[] allTables;
     private VerticalLayout dataForm;
     private SplitLayout secondLayout;
-    private HeaderComponent headerComponent = new HeaderComponent();
+    private HeaderComponent headerComponent;
 
     public HomeView() {
         addClassName("home-view");
+        newTableColumns = new HashSet<>();
+        headerComponent = new HeaderComponent();
         secondLayout = new SplitLayout();
         secondLayout.addThemeVariants(SplitLayoutVariant.LUMO_SMALL);
         secondLayout.setSplitterPosition(50);
@@ -76,18 +78,16 @@ public class HomeView extends HorizontalLayout {
 
     public void showTables(){
         listBox = new ListBox<>();
-        listBox.addValueChangeListener(e->{
-            if (e.getValue() == null) return;
-            clearForm();
-            showTableColumnsAndGrid(e.getValue());
-            System.out.println("event");
-        });
         if (allTables.length > 0){
             listBox.setItems(allTables);
             listBox.setValue(allTables[0]);
             showTableColumnsAndGrid(allTables[0]);
-            System.out.println("default");
         }
+        listBox.addValueChangeListener(e->{
+            if (e.getValue() == null) return;
+            resetForm();
+            showTableColumnsAndGrid(e.getValue());
+        });
         listBoxLayout.add(listBox);
         mainLayout.addToPrimary(listBoxLayout);
     }
@@ -112,11 +112,9 @@ public class HomeView extends HorizontalLayout {
             clearForm();
             allTables = ApiClient.getAllTables();
             listBox.setItems(allTables);
-            //listBox.setValue(null);
         });
         Button cancel = new Button("Cancel", VaadinIcon.CLOSE_CIRCLE.create(),e -> {
             clearForm();
-            //listBox.setValue(null);
         });
         Button addColumnButton = new Button("", VaadinIcon.PLUS.create(),e -> {
             addColumn(columnName);
@@ -171,7 +169,6 @@ public class HomeView extends HorizontalLayout {
         buttonLayout.setDefaultVerticalComponentAlignment(Alignment.END);
         Button cancel = new Button("Cancel", VaadinIcon.CLOSE_CIRCLE.create(),e -> {
             clearForm();
-            //listBox.setValue(null);
         });
         Button save = new Button("Save", VaadinIcon.FILE_ADD.create(), e -> {
             clearForm();
@@ -207,7 +204,11 @@ public class HomeView extends HorizontalLayout {
     }
 
     private void clearForm(){
+        resetForm();
         listBox.setValue(null);
+    }
+
+    private void resetForm(){
         operationLayout.setVisible(false);
         tableName.clear();
         columnName.clear();
