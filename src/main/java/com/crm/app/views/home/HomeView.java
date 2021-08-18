@@ -2,6 +2,7 @@ package com.crm.app.views.home;
 
 import com.crm.app.api.ApiClient;
 import com.crm.app.component.HeaderComponent;
+import com.crm.app.component.LayoutComponent;
 import com.crm.app.views.MainLayout;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.dependency.CssImport;
@@ -11,8 +12,6 @@ import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.listbox.ListBox;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.component.splitlayout.SplitLayout;
-import com.vaadin.flow.component.splitlayout.SplitLayoutVariant;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
@@ -30,28 +29,39 @@ import java.util.Set;
 @RouteAlias(value = "", layout = MainLayout.class)
 public class HomeView extends HorizontalLayout {
 
-    private SplitLayout mainLayout;
-    private VerticalLayout formLayout;
     private VerticalLayout columnLayout;
     private HorizontalLayout operationLayout;
-    private VerticalLayout gridLayout;
-    private VerticalLayout listBoxLayout;
     private TextField tableName;
     private TextField columnName;
-    private ListBox<String> listBox;
     private Set<String> newTableColumns;
     private Grid<Map<String, String>> grid;
-    private String[] allTables;
     private VerticalLayout dataForm;
-    private SplitLayout secondLayout;
+    private ListBox<String> listBox;
+    private String[] allTables;
     private HeaderComponent headerComponent;
+    private LayoutComponent layoutComponent;
 
     public HomeView() {
         addClassName("home-view");
         initializing();
         createTableForm();
         showTables();
-        add(headerComponent.getHeader(),mainLayout,gridLayout);
+        add(headerComponent.getHeader(),layoutComponent.getMainLayout(),layoutComponent.getGridLayout());
+    }
+
+    private void initializing(){
+        newTableColumns = new HashSet<>();
+        allTables = ApiClient.getAllTables();
+        headerComponent = new HeaderComponent();
+        layoutComponent = new LayoutComponent();
+        grid = new Grid<>();
+        grid.addItemClickListener(e -> fillDataForm(e.getItem()));
+        grid.setMaxHeight("350px");
+        layoutComponent.getGridLayout().add(grid);
+        dataForm = new VerticalLayout();
+        layoutComponent.getSecondLayout().addToSecondary(dataForm);
+        tableName = new TextField("Table name");
+        columnName = new TextField("Column name");
     }
 
     public void showTables(){
@@ -66,8 +76,8 @@ public class HomeView extends HorizontalLayout {
             resetForm();
             showTableColumnsAndGrid(e.getValue());
         });
-        listBoxLayout.add(listBox);
-        mainLayout.addToPrimary(listBoxLayout);
+        layoutComponent.getListBoxLayout().add(listBox);
+        layoutComponent.getMainLayout().addToPrimary(layoutComponent.getListBoxLayout());
     }
 
     private void createTableForm() {
@@ -84,7 +94,6 @@ public class HomeView extends HorizontalLayout {
         });
         columnName.setWidth("160px");
         columnName.setRequired(true);
-
         Button save = new Button("Save", VaadinIcon.FILE_ADD.create(), e -> {
             ApiClient.createTable(tableName.getValue(), newTableColumns);
             clearForm();
@@ -101,8 +110,8 @@ public class HomeView extends HorizontalLayout {
         buttonLayout.add(tableName, columnName, addColumnButton);
         operationLayout.add(cancel,save);
         operationLayout.setVisible(false);
-        formLayout.add(buttonLayout,columnLayout,operationLayout);
-        secondLayout.addToPrimary(formLayout);
+        layoutComponent.getFormLayout().add(buttonLayout,columnLayout,operationLayout);
+        layoutComponent.getSecondLayout().addToPrimary(layoutComponent.getFormLayout());
     }
 
     private void addColumn(TextField columnName){
@@ -194,31 +203,5 @@ public class HomeView extends HorizontalLayout {
         newTableColumns.clear();
         grid.removeAllColumns();
         dataForm.removeAll();
-    }
-
-    private void initializing(){
-        newTableColumns = new HashSet<>();
-        headerComponent = new HeaderComponent();
-        secondLayout = new SplitLayout();
-        secondLayout.addThemeVariants(SplitLayoutVariant.LUMO_SMALL);
-        secondLayout.setSplitterPosition(50);
-        secondLayout.setMaxHeight("450px");
-        mainLayout = new SplitLayout();
-        mainLayout.addThemeVariants(SplitLayoutVariant.LUMO_SMALL);
-        mainLayout.setSplitterPosition(15);
-        mainLayout.addToSecondary(secondLayout);
-        gridLayout = new VerticalLayout(new Label("Table Data"));
-        grid = new Grid<>();
-        grid.addItemClickListener(e -> fillDataForm(e.getItem()));
-        grid.setMaxHeight("350px");
-        gridLayout.add(grid);
-        listBoxLayout = new VerticalLayout(new Label("Tables"));
-        formLayout = new VerticalLayout(new Label("Create/Update table"));
-        formLayout.setMaxHeight("450px");
-        allTables = ApiClient.getAllTables();
-        dataForm = new VerticalLayout();
-        secondLayout.addToSecondary(dataForm);
-        tableName = new TextField("Table name");
-        columnName = new TextField("Column name");
     }
 }
