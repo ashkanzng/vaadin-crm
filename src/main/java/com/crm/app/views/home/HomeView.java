@@ -48,29 +48,7 @@ public class HomeView extends HorizontalLayout {
 
     public HomeView() {
         addClassName("home-view");
-        newTableColumns = new HashSet<>();
-        headerComponent = new HeaderComponent();
-        secondLayout = new SplitLayout();
-        secondLayout.addThemeVariants(SplitLayoutVariant.LUMO_SMALL);
-        secondLayout.setSplitterPosition(50);
-        secondLayout.setMaxHeight("450px");
-        mainLayout = new SplitLayout();
-        mainLayout.addThemeVariants(SplitLayoutVariant.LUMO_SMALL);
-        mainLayout.setSplitterPosition(15);
-        mainLayout.addToSecondary(secondLayout);
-        gridLayout = new VerticalLayout(new Label("Table Data"));
-        grid = new Grid<>();
-        grid.addItemClickListener(e -> fillDataForm(e.getItem()));
-        grid.setMaxHeight("350px");
-        gridLayout.add(grid);
-        listBoxLayout = new VerticalLayout(new Label("Tables"));
-        formLayout = new VerticalLayout(new Label("Create/Update table"));
-        formLayout.setMaxHeight("450px");
-        allTables = ApiClient.getAllTables();
-        dataForm = new VerticalLayout();
-        secondLayout.addToSecondary(dataForm);
-        tableName = new TextField("Table name");
-        columnName = new TextField("Column name");
+        initializing();
         createTableForm();
         showTables();
         add(headerComponent.getHeader(),mainLayout,gridLayout);
@@ -218,4 +196,29 @@ public class HomeView extends HorizontalLayout {
         dataForm.removeAll();
     }
 
+    private void initializing(){
+        newTableColumns = new HashSet<>();
+        headerComponent = new HeaderComponent();
+        secondLayout = new SplitLayout();
+        secondLayout.addThemeVariants(SplitLayoutVariant.LUMO_SMALL);
+        secondLayout.setSplitterPosition(50);
+        secondLayout.setMaxHeight("450px");
+        mainLayout = new SplitLayout();
+        mainLayout.addThemeVariants(SplitLayoutVariant.LUMO_SMALL);
+        mainLayout.setSplitterPosition(15);
+        mainLayout.addToSecondary(secondLayout);
+        gridLayout = new VerticalLayout(new Label("Table Data"));
+        grid = new Grid<>();
+        grid.addItemClickListener(e -> fillDataForm(e.getItem()));
+        grid.setMaxHeight("350px");
+        gridLayout.add(grid);
+        listBoxLayout = new VerticalLayout(new Label("Tables"));
+        formLayout = new VerticalLayout(new Label("Create/Update table"));
+        formLayout.setMaxHeight("450px");
+        allTables = ApiClient.getAllTables();
+        dataForm = new VerticalLayout();
+        secondLayout.addToSecondary(dataForm);
+        tableName = new TextField("Table name");
+        columnName = new TextField("Column name");
+    }
 }
