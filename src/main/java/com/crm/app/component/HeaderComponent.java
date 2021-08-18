@@ -12,6 +12,7 @@ public class HeaderComponent {
         this.header.getStyle().set("border-bottom", "1px solid #EEEEEE").set("padding-bottom", "10px");
         header.add(new H4("SQLite schema tables"));
     }
+    
     public HorizontalLayout getHeader() {
         return header;
     }
