@@ -78,12 +78,15 @@ public class HomeView extends HorizontalLayout {
         listBox = new ListBox<>();
         listBox.addValueChangeListener(e->{
             if (e.getValue() == null) return;
+            clearForm();
             showTableColumnsAndGrid(e.getValue());
+            System.out.println("event");
         });
         if (allTables.length > 0){
             listBox.setItems(allTables);
             listBox.setValue(allTables[0]);
             showTableColumnsAndGrid(allTables[0]);
+            System.out.println("default");
         }
         listBoxLayout.add(listBox);
         mainLayout.addToPrimary(listBoxLayout);
@@ -109,11 +112,11 @@ public class HomeView extends HorizontalLayout {
             clearForm();
             allTables = ApiClient.getAllTables();
             listBox.setItems(allTables);
-            listBox.setValue(null);
+            //listBox.setValue(null);
         });
         Button cancel = new Button("Cancel", VaadinIcon.CLOSE_CIRCLE.create(),e -> {
             clearForm();
-            listBox.setValue(null);
+            //listBox.setValue(null);
         });
         Button addColumnButton = new Button("", VaadinIcon.PLUS.create(),e -> {
             addColumn(columnName);
@@ -168,6 +171,7 @@ public class HomeView extends HorizontalLayout {
         buttonLayout.setDefaultVerticalComponentAlignment(Alignment.END);
         Button cancel = new Button("Cancel", VaadinIcon.CLOSE_CIRCLE.create(),e -> {
             clearForm();
+            //listBox.setValue(null);
         });
         Button save = new Button("Save", VaadinIcon.FILE_ADD.create(), e -> {
             clearForm();
@@ -194,7 +198,6 @@ public class HomeView extends HorizontalLayout {
     }
 
     private void showTableColumnsAndGrid(String nameOfTable){
-        clearForm();
         tableName.setValue(nameOfTable);
         operationLayout.setVisible(true);
         for (String column : ApiClient.getTableSchema(nameOfTable)) {
@@ -204,6 +207,7 @@ public class HomeView extends HorizontalLayout {
     }
 
     private void clearForm(){
+        listBox.setValue(null);
         operationLayout.setVisible(false);
         tableName.clear();
         columnName.clear();
@@ -211,7 +215,6 @@ public class HomeView extends HorizontalLayout {
         newTableColumns.clear();
         grid.removeAllColumns();
         dataForm.removeAll();
-        listBox.setValue(null);
     }
 
 }
