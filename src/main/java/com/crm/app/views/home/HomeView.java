@@ -79,27 +79,22 @@ public class HomeView extends HorizontalLayout {
         tableName = new TextField("Table name");
         columnName = new TextField("Column name");
 
-        showTables();
         createTableForm();
+        showTables();
         add(headerComponent.getHeader(),mainLayout,gridLayout);
     }
 
-    private void showTables() {
+    public void showTables(){
         listBox = new ListBox<>();
-        listBox.setItems(allTables);
-        listBox.setValue(allTables[0]);
-        listBox.addValueChangeListener(e -> {
-            if (e.getValue() == null){
-                return;
-            }
-            clearForm();
-            tableName.setValue(e.getValue());
-            operationLayout.setVisible(true);
-            for (String column : ApiClient.getTableSchema(e.getValue())) {
-                addColumn(new TextField("",column,""));
-            }
-            createTableGrid(e.getValue());
+        listBox.addValueChangeListener(e->{
+            if (e.getValue() == null) return;
+            showTableColumnsAndGrid(e.getValue());
         });
+        if (allTables.length > 0){
+            listBox.setItems(allTables);
+            listBox.setValue(allTables[0]);
+            showTableColumnsAndGrid(allTables[0]);
+        }
         listBoxLayout.add(listBox);
         mainLayout.addToPrimary(listBoxLayout);
     }
@@ -184,7 +179,7 @@ public class HomeView extends HorizontalLayout {
         buttonLayout.setDefaultVerticalComponentAlignment(Alignment.END);
         Button cancel = new Button("Cancel", VaadinIcon.CLOSE_CIRCLE.create(),e -> {
             clearForm();
-            //listBox.setValue(null);
+            listBox.setValue(null);
         });
         Button save = new Button("Save", VaadinIcon.FILE_ADD.create(), e -> {
             clearForm();
@@ -209,6 +204,16 @@ public class HomeView extends HorizontalLayout {
                 field.setValue(row.get(c.getElement().getProperty("name")));
             }
         });
+    }
+
+    private void showTableColumnsAndGrid(String nameOfTable){
+        clearForm();
+        tableName.setValue(nameOfTable);
+        operationLayout.setVisible(true);
+        for (String column : ApiClient.getTableSchema(nameOfTable)) {
+            addColumn(new TextField("",column,""));
+        }
+        createTableGrid(nameOfTable);
     }
 
     private void clearForm(){
