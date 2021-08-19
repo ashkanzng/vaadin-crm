@@ -16,7 +16,6 @@ import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.router.RouteAlias;
-
 import java.util.*;
 
 
@@ -148,6 +147,7 @@ public class HomeView extends HorizontalLayout {
     }
 
     private void createDataForm(String[] headers){
+        dataForm.removeAll();
         dataForm.add(new Label("Insert/Update data"));
         HorizontalLayout buttonLayout = new HorizontalLayout();
         buttonLayout.setDefaultVerticalComponentAlignment(Alignment.END);
@@ -155,6 +155,7 @@ public class HomeView extends HorizontalLayout {
             clearForm();
         });
         Button save = new Button("Save", VaadinIcon.FILE_ADD.create(), e -> {
+            saveDataForm();
             clearForm();
         });
         for (String header : headers) {
@@ -170,18 +171,40 @@ public class HomeView extends HorizontalLayout {
     }
 
     private void fillDataForm(Map<String, String> row){
-        dataForm.getChildren().forEach(c -> {
-            if (c instanceof TextField && row.get(c.getElement().getProperty("name")) != null){
-                TextField field = (TextField)c;
-                field.setValue(row.get(c.getElement().getProperty("name")));
+        TextField id = new TextField("ID",row.get("id"),"");
+        id.getElement().setProperty("name","id");
+        id.setReadOnly(true);
+        dataForm.addComponentAtIndex(1,id);
+        dataForm.getChildren().forEach(field -> {
+            if (field instanceof TextField && row.get(field.getElement().getProperty("name")) != null){
+                TextField textField = (TextField)field;
+                textField.setValue(row.get(field.getElement().getProperty("name")));
             }
         });
+    }
+
+    private void saveDataForm(){
+        List<Map<String, String>> dataList = new ArrayList<>();
+        Map<String, String> data = new HashMap<>();
+        dataForm.getChildren().forEach(field -> {
+            if (field instanceof TextField){
+                TextField textField = (TextField)field;
+                data.put(textField.getElement().getProperty("name"),textField.getValue());
+            }
+        });
+        dataList.add(data);
+        if (data.get("id") == null){
+            ApiClient.addTableData(listBox.getValue(),dataList, Optional.empty());
+            return;
+        }
+        Optional<Integer> id = Optional.of(Integer.parseInt(data.get("id")));
+        data.remove("id");
+        ApiClient.addTableData(listBox.getValue(),dataList,id);
     }
 
     private void showTableColumnsAndGrid(String nameOfTable){
         tableName.setValue(nameOfTable);
         operationLayout.setVisible(true);
-        System.out.println(Arrays.toString(ApiClient.getTableSchema(nameOfTable)));
         for (String column : ApiClient.getTableSchema(nameOfTable)) {
             addColumn(new TextField("",column,""));
         }

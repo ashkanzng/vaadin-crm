@@ -13,7 +13,6 @@ import java.util.*;
 public class ApiClient {
 
     private final static Logger logger = LoggerFactory.getLogger(ApiClient.class);
-
     //static final String URL = "http://localhost:8082/api/";
     static final String URL = "http://157.90.55.120:8082/api/";
     static final RestTemplate restTemplate = new RestTemplate();
@@ -41,7 +40,6 @@ public class ApiClient {
             Arrays.sort(tableColumnRequest);
             HttpEntity<String> request = new HttpEntity<>(mapper.writeValueAsString(tableNameRequest), headers);
             ResponseEntity<String> result = restTemplate.postForEntity(URL + "create-table", request, String.class);
-            System.out.println(result.getStatusCode());
             request = new HttpEntity<>(mapper.writeValueAsString(tableColumnRequest), headers);
             result = restTemplate.postForEntity(URL + "add-header/" + tableName, request, String.class);
             if (result.getStatusCode() == HttpStatus.OK) {
@@ -64,5 +62,22 @@ public class ApiClient {
             logger.error(httpClientErrorException.getMessage());
         }
         return null;
+    }
+
+    public static void addTableData(String tableName, List<Map<String, String>> data, Optional<Integer> id){
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        try{
+            HttpEntity<String> request = new HttpEntity<>(mapper.writeValueAsString(data), headers);
+            if (id.isPresent()){
+                ResponseEntity<String> result = restTemplate.postForEntity(URL + "update/" + tableName+"/"+id.get(), request, String.class);
+                System.out.println(result.getBody());
+                return;
+            }
+            ResponseEntity<String> result = restTemplate.postForEntity(URL + "add-data/" + tableName, request, String.class);
+            System.out.println(result.getBody());
+        }catch (HttpClientErrorException | JsonProcessingException ex ){
+            logger.info(ex.getMessage());
+        }
     }
 }
