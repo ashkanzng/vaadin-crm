@@ -70,11 +70,9 @@ public class ApiClient {
             HttpEntity<String> request = new HttpEntity<>(mapper.writeValueAsString(data), headers);
             if (id.isPresent()){
                 ResponseEntity<String> result = restTemplate.postForEntity(URL + "update/" + tableName+"/"+id.get(), request, String.class);
-                System.out.println(result.getBody());
                 return;
             }
             ResponseEntity<String> result = restTemplate.postForEntity(URL + "add-data/" + tableName, request, String.class);
-            System.out.println(result.getBody());
         }catch (HttpClientErrorException | JsonProcessingException ex ){
             logger.info(ex.getMessage());
         }
