@@ -13,8 +13,7 @@ import java.util.*;
 public class ApiClient {
 
     private final static Logger logger = LoggerFactory.getLogger(ApiClient.class);
-    //static final String URL = "http://localhost:8082/api/";
-    static final String URL = "http://157.90.55.120:8082/api/";
+    static final String URL = "http://localhost:8082/api/";
     static final RestTemplate restTemplate = new RestTemplate();
     static ObjectMapper mapper = new ObjectMapper();
 
