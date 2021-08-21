@@ -25,7 +25,7 @@ public class LayoutComponent {
         listBoxLayout = new VerticalLayout(new Label("Tables"));
         gridLayout = new VerticalLayout(new Label("Table Data"));
         formLayout = new VerticalLayout(new Label("Create/Update table"));
-        formLayout.setMaxHeight("450px");
+        //formLayout.setMaxHeight("450px");
     }
     public SplitLayout getMainLayout() {
         return mainLayout;

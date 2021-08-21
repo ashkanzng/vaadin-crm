@@ -6,6 +6,7 @@ import com.crm.app.component.LayoutComponent;
 import com.crm.app.views.MainLayout;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.dependency.CssImport;
+import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.icon.VaadinIcon;
@@ -16,6 +17,7 @@ import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.router.RouteAlias;
+
 import java.util.*;
 
 
@@ -31,11 +33,13 @@ public class HomeView extends HorizontalLayout {
     private TextField columnName;
     private Set<String> newTableColumns;
     private Grid<Map<String, String>> grid;
-    private VerticalLayout dataForm;
+    private VerticalLayout dataFormLayout;
     private ListBox<String> listBox;
     private String[] allTables;
     private HeaderComponent headerComponent;
     private LayoutComponent layoutComponent;
+
+    private FormLayout dataForm;
 
     public HomeView() {
         addClassName("home-view");
@@ -54,8 +58,12 @@ public class HomeView extends HorizontalLayout {
         grid.addItemClickListener(e -> fillDataForm(e.getItem()));
         grid.setMaxHeight("350px");
         layoutComponent.getGridLayout().add(grid);
-        dataForm = new VerticalLayout();
-        layoutComponent.getSecondLayout().addToSecondary(dataForm);
+
+        dataForm = new FormLayout();
+        dataForm.setResponsiveSteps(
+                new FormLayout.ResponsiveStep("0", 1),
+                new FormLayout.ResponsiveStep("150px", 2)
+        );
         tableName = new TextField("Table name");
         columnName = new TextField("Column name");
     }
@@ -148,15 +156,13 @@ public class HomeView extends HorizontalLayout {
 
     private void createDataForm(String[] headers){
         dataForm.removeAll();
-        dataForm.add(new Label("Insert/Update data"));
         HorizontalLayout buttonLayout = new HorizontalLayout();
+        dataFormLayout = new VerticalLayout(new Label("Insert/Update data"));
         buttonLayout.setDefaultVerticalComponentAlignment(Alignment.END);
         Button cancel = new Button("Cancel", VaadinIcon.CLOSE_CIRCLE.create(),e -> {
-            clearForm();
         });
         Button save = new Button("Save", VaadinIcon.FILE_ADD.create(), e -> {
             saveDataForm();
-            clearForm();
         });
         for (String header : headers) {
             TextField field = new TextField(header);
@@ -167,20 +173,24 @@ public class HomeView extends HorizontalLayout {
             dataForm.add(field);
         }
         HorizontalLayout operationLayout = new HorizontalLayout(save,cancel);
-        dataForm.add(operationLayout);
+        dataFormLayout.add(dataForm,operationLayout);
+        layoutComponent.getSecondLayout().addToSecondary(dataFormLayout);
     }
 
     private void fillDataForm(Map<String, String> row){
+
         TextField id = new TextField("ID",row.get("id"),"");
         id.getElement().setProperty("name","id");
         id.setReadOnly(true);
-        dataForm.addComponentAtIndex(1,id);
+
         dataForm.getChildren().forEach(field -> {
             if (field instanceof TextField && row.get(field.getElement().getProperty("name")) != null){
-                TextField textField = (TextField)field;
+                TextField textField = (TextField) field;
+                if (textField.getElement().getProperty("name").equals("id")) dataForm.remove(textField);
                 textField.setValue(row.get(field.getElement().getProperty("name")));
             }
         });
+        dataForm.addComponentAtIndex(1,id);
     }
 
     private void saveDataForm(){
@@ -223,6 +233,6 @@ public class HomeView extends HorizontalLayout {
         columnLayout.removeAll();
         newTableColumns.clear();
         grid.removeAllColumns();
-        dataForm.removeAll();
+        dataFormLayout.removeAll();
     }
 }
