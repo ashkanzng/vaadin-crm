@@ -17,7 +17,6 @@ import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.router.RouteAlias;
-
 import java.util.*;
 
 
@@ -38,8 +37,8 @@ public class HomeView extends HorizontalLayout {
     private String[] allTables;
     private HeaderComponent headerComponent;
     private LayoutComponent layoutComponent;
-
     private FormLayout dataForm;
+    private FormLayout columnForm;
 
     public HomeView() {
         addClassName("home-view");
@@ -56,13 +55,20 @@ public class HomeView extends HorizontalLayout {
         layoutComponent = new LayoutComponent();
         grid = new Grid<>();
         grid.addItemClickListener(e -> fillDataForm(e.getItem()));
-        grid.setMaxHeight("350px");
+        grid.setMaxHeight("450px");
         layoutComponent.getGridLayout().add(grid);
-
         dataForm = new FormLayout();
         dataForm.setResponsiveSteps(
                 new FormLayout.ResponsiveStep("0", 1),
-                new FormLayout.ResponsiveStep("150px", 2)
+                new FormLayout.ResponsiveStep("400px", 2),
+                new FormLayout.ResponsiveStep("700px", 3),
+                new FormLayout.ResponsiveStep("900px", 4)
+        );
+        columnForm = new FormLayout();
+        columnForm.setResponsiveSteps(
+                new FormLayout.ResponsiveStep("0", 1),
+                new FormLayout.ResponsiveStep("300px", 2),
+                new FormLayout.ResponsiveStep("700px", 3)
         );
         tableName = new TextField("Table name");
         columnName = new TextField("Column name");
@@ -85,11 +91,11 @@ public class HomeView extends HorizontalLayout {
     }
 
     private void createTableForm() {
-
         columnLayout = new VerticalLayout();
         operationLayout = new HorizontalLayout();
         HorizontalLayout buttonLayout = new HorizontalLayout();
         columnLayout.setPadding(false);
+        columnLayout.add(columnForm);
         buttonLayout.setDefaultVerticalComponentAlignment(Alignment.END);
         tableName.setRequired(true);
         tableName.setWidth("200px");
@@ -135,7 +141,7 @@ public class HomeView extends HorizontalLayout {
             newColumn.setReadOnly(true);
             newColumn.setMaxWidth("200px");
             newTableColumns.add(columnName.getValue());
-            columnLayout.add(newColumn);
+            columnForm.add(newColumn);
         }
         if (!operationLayout.isVisible()) operationLayout.setVisible(true);
     }
@@ -160,9 +166,12 @@ public class HomeView extends HorizontalLayout {
         dataFormLayout = new VerticalLayout(new Label("Insert/Update data"));
         buttonLayout.setDefaultVerticalComponentAlignment(Alignment.END);
         Button cancel = new Button("Cancel", VaadinIcon.CLOSE_CIRCLE.create(),e -> {
+            clearForm();
         });
         Button save = new Button("Save", VaadinIcon.FILE_ADD.create(), e -> {
             saveDataForm();
+            grid.removeAllColumns();
+            createTableGrid(listBox.getValue());
         });
         for (String header : headers) {
             TextField field = new TextField(header);
@@ -178,11 +187,9 @@ public class HomeView extends HorizontalLayout {
     }
 
     private void fillDataForm(Map<String, String> row){
-
         TextField id = new TextField("ID",row.get("id"),"");
         id.getElement().setProperty("name","id");
         id.setReadOnly(true);
-
         dataForm.getChildren().forEach(field -> {
             if (field instanceof TextField && row.get(field.getElement().getProperty("name")) != null){
                 TextField textField = (TextField) field;
@@ -190,7 +197,7 @@ public class HomeView extends HorizontalLayout {
                 textField.setValue(row.get(field.getElement().getProperty("name")));
             }
         });
-        dataForm.addComponentAtIndex(1,id);
+        dataForm.addComponentAtIndex(0,id);
     }
 
     private void saveDataForm(){
@@ -230,7 +237,7 @@ public class HomeView extends HorizontalLayout {
         operationLayout.setVisible(false);
         tableName.clear();
         columnName.clear();
-        columnLayout.removeAll();
+        columnForm.removeAll();
         newTableColumns.clear();
         grid.removeAllColumns();
         dataFormLayout.removeAll();

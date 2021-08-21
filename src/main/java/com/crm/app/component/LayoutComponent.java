@@ -15,9 +15,9 @@ public class LayoutComponent {
 
     public LayoutComponent() {
         secondLayout = new SplitLayout();
-        secondLayout.addThemeVariants(SplitLayoutVariant.LUMO_SMALL);
+        secondLayout.addThemeVariants();
         secondLayout.setSplitterPosition(50);
-        secondLayout.setMaxHeight("450px");
+        //secondLayout.setMaxHeight("450px");
         mainLayout = new SplitLayout();
         mainLayout.addThemeVariants(SplitLayoutVariant.LUMO_SMALL);
         mainLayout.setSplitterPosition(15);
