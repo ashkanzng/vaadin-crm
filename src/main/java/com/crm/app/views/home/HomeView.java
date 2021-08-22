@@ -60,18 +60,19 @@ public class HomeView extends HorizontalLayout {
         dataForm = new FormLayout();
         dataForm.setResponsiveSteps(
                 new FormLayout.ResponsiveStep("0", 1),
-                new FormLayout.ResponsiveStep("400px", 2),
-                new FormLayout.ResponsiveStep("700px", 3),
-                new FormLayout.ResponsiveStep("900px", 4)
+                new FormLayout.ResponsiveStep("350px", 2),
+                new FormLayout.ResponsiveStep("500px", 3),
+                new FormLayout.ResponsiveStep("700px", 4)
         );
         columnForm = new FormLayout();
         columnForm.setResponsiveSteps(
                 new FormLayout.ResponsiveStep("0", 1),
-                new FormLayout.ResponsiveStep("300px", 2),
-                new FormLayout.ResponsiveStep("700px", 3)
+                new FormLayout.ResponsiveStep("350px", 2),
+                new FormLayout.ResponsiveStep("600px", 3)
         );
         tableName = new TextField("Table name");
         columnName = new TextField("Column name");
+
     }
 
     public void showTables(){
@@ -153,7 +154,12 @@ public class HomeView extends HorizontalLayout {
         }
         String[] headers = ApiClient.getTableSchema(tableName);
         for (String column : headers) {
-            grid.addColumn(myhash -> myhash.get(column)).setHeader(column).setSortable(true).setAutoWidth(true);
+            grid.addColumn(col -> {
+                if (col.get(column) == null || col.get(column).isEmpty()){
+                    return "-";
+                }
+                return col.get(column);
+            }).setHeader(column).setSortable(true).setAutoWidth(true);
         }
         //grid.addColumn(myhash -> myhash.get("id")).setHeader("Id").setSortable(true);
         grid.setItems(data);
